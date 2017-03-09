@@ -23,6 +23,7 @@ struct		s_bot
 	int 	y;
 	char 	player;
 	char 	**map;
+	int 	**wt_path;
 }typedef	t_bot;
 
 struct		s_piece

@@ -67,8 +67,8 @@ char	find_player(char *line)
 	if (!ft_strstr(line, "/filler"))
 		return (0);
 	if (ft_strstr(line, "p1"))
-		return ('O');
-	return ('X');
+		return ('o');
+	return ('x');
 }
 
 
