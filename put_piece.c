@@ -116,26 +116,31 @@ void	wave_matrix(t_bot	*bot, t_coordinates yx)
 	int lf_end;
 
 	d = 1;
+	lf_end = 0;
+	int t = yx.x + 1;
 	while (d < M(yx.x, A(bot->yx.x - yx.x)) || d < M(yx.y, A(bot->yx.y - yx.y)))
 	{
-		i = yx.x - d;
-		j = yx.y - d - 1;
-		lf_end = 2 << (d - 1);
+		i = t - d;
+		j = yx.y - d;
 		k = 0;
 		printf("\n \t test: \t %d\n", d);
-		while (++j <= lf_end + 1)
+		lf_end += 2 + d;
+//		lf_end += d > 1 ? 1 : 0;
+		while (lf_end--)
 		{
 			if (i >= 0 && j >= 0 && i < bot->yx.x && bot->wt_path[i][j] == MAX_INT_MAP)
 			bot->wt_path[i][j] = d;
 			if (i >= 0 && j >= 0 && j < bot->yx.y && bot->wt_path[i + k][yx.y - d] == MAX_INT_MAP)
 				bot->wt_path[i + k][yx.y - d] = d;
-//			printf("\n lf_end\n");
-//			write_weither_matrix(*bot);
-//			sleep(3);
+			printf("\n lf_end\n");
+			write_weither_matrix(*bot);
+			sleep(3);
 			k++;
+			j++;
 		}
+		lf_end += 1 + d;
 		j = yx.y + d;
-		i = yx.x + d;
+		i = t + d;
 		k = 0;
 		rt_end = (2 << (d - 1)) + 1;
 		while (--rt_end)
@@ -144,9 +149,9 @@ void	wave_matrix(t_bot	*bot, t_coordinates yx)
 				bot->wt_path[i][j] = d;
 			if (i >= 0 && j >= 0 && j < bot->yx.y && i < bot->yx.x && bot->wt_path[i - k][yx.y + d] == MAX_INT_MAP)
 				bot->wt_path[i - k][yx.y + d] = d;
-//			printf("\n rt_end\n");
-//			write_weither_matrix(*bot);
-//			sleep(3);
+			printf("\n rt_end\n");
+			write_weither_matrix(*bot);
+			sleep(3);
 			j--;
 			k++;
 		}
