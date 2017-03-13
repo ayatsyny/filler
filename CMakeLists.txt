@@ -5,6 +5,8 @@ set(CCMAKE_C_FLAGS "-std=c99")
 
 set(SOURCE_FILES
         pars_data.c
+        put_piece.c
+        wave_matrix.c
         ./libft/get_next_line/get_next_line.c
         ./libft/get_next_line/get_next_line.h
         filler.h)
