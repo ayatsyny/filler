@@ -10,9 +10,18 @@
 
 int g_fd;
 
+//
+//void write_strs(char **strs)
+//{
+//	int i = -1;
+//	while (strs[++i])
+//		printf("%s\n", strs[i]);
+//}
 
 void	init_y_and_x(char *line, int *y, int *x)
 {
+	if (!line || ft_strlen(line) == 0)
+		return ;
 	*x = ft_atoi(ft_strchr(line, ' '));
 	*y = ft_atoi(ft_strrchr(line, ' '));
 }
@@ -41,24 +50,27 @@ void	init_bot_wt_matrix(t_bot *bot)
 	int j;
 
 	i = -1;
+	bot->p_yx = zero_coordinates();
 	while (++i < bot->yx.x)
 	{
 		j = -1;
 		while (++j < bot->yx.y)
-			if (bot->map[i][j] != '.')
-				bot->wt_path[i][j] =
-						bot->player == bot->map[i][j] ||
-								bot->player - 32 == bot->map[i][j] ? 0 : -1;
-			else
+			if (bot->map[i][j] == '.')
 				bot->wt_path[i][j] = MAX_INT_MAP;
+			else
+				bot->wt_path[i][j] = bot->player == bot->map[i][j] ? -2 : 0;
 	}
 }
+
+
 
 void	init_piece(t_piece *piece, char *line)
 {
 	int i;
 
 	i = -1;
+	while (get_next_line(g_fd, &line) && !ft_strstr(line, "Piece"))
+		;
 	init_y_and_x(line, &piece->yx.y, &piece->yx.x);
 	if (!(piece->map = (char **)malloc((piece->yx.x + 1) * sizeof(char*))))
 		return ;
@@ -67,7 +79,6 @@ void	init_piece(t_piece *piece, char *line)
 		get_next_line(g_fd, &line);
 		piece->map[i] = ft_strnew((size_t)piece->yx.y);
 		ft_strcpy(piece->map[i], line);
-		free(line);
 	}
 	piece->map[i] = NULL;
 }
@@ -86,34 +97,29 @@ void	del_matrix_str(char **matrix)
 	matrix = NULL;
 }
 
-char	find_player(char *line)
+void	find_players(t_bot *bot, char *line)
 {
 	get_next_line(g_fd, &line);
+	while (!(ft_strstr(line, "$$$") && ft_strstr(line, "/filler")))
+		get_next_line(g_fd, &line);
 	if (!ft_strstr(line, "/filler"))
-		return (0);
+		return ;
 	if (ft_strstr(line, "p1"))
-		return ('o');
-	return ('x');
+		bot->player = 'O';
+	else
+		bot->player = 'X';
+	bot->pc_player = bot->player == 'O' ? 'X' : 'O';
 }
 
 
-void	read_maps(t_bot *bot, t_piece *piece, char *line)
+void	read_map_bot(t_bot *bot, char *line)
 {
-	int flag_read_piece;
 	int i;
 
 	i = -1;
-	flag_read_piece = 1;
-	while (flag_read_piece && get_next_line(g_fd, &line))
-	{
+	while (i + 1 < bot->yx.x && get_next_line(g_fd, &line))
 		if (line[0] == '0')
 			ft_strcpy(bot->map[++i], line + 4);
-		else if (ft_strstr(line, "Piece"))
-		{
-			init_piece(piece, line);
-			flag_read_piece = 0;
-		}
-	}
 }
 
 
@@ -150,18 +156,37 @@ void	output_res(char *file_name, t_bot bot, t_piece piece, t_coordinates yx)
 	ft_putendl_fd(y, fout);
 //	close(fout);
 }
-void output_player(char *file_name, char c)
+void output_player(char *file_name, t_bot bot)
 {
 	int fout;
 
 	fout = open(file_name, O_WRONLY | O_CREAT, S_IWRITE | S_IREAD);
 	if (fout == -1)
 		perror(strerror(errno));
-	ft_putchar_fd(c, fout);
+	ft_putstr_fd("User player: ", fout);
+	ft_putchar_fd(bot.player, fout);
 	ft_putchar_fd('\n', fout);
-	close(fout);
+	ft_putstr_fd("PC player: ", fout);
+	ft_putchar_fd(bot.pc_player, fout);
+	ft_putchar_fd('\n', fout);
+	//close(fout);
 }
 
+
+void	ft_write(t_coordinates yx)
+{
+	char *x;
+	char *y;
+
+	x = ft_itoa(yx.x);
+	y = ft_itoa(yx.y);
+	write(1, x, ft_strlen(x));
+	write(1, " ", 1);
+	write(1, y, ft_strlen(y));
+	write(1, "\n", 1);
+	free(x);
+	free(y);
+}
 
 void	run_bot(t_bot *bot, t_piece *piece, char *line)
 {
@@ -169,20 +194,25 @@ void	run_bot(t_bot *bot, t_piece *piece, char *line)
 	t_coordinates res;
 
 
+//	read_maps(bot, piece, line);
+//	write_strs(piece->map);
 	i = 9902; // magic number (max map 100 * 99 ~ 9900 + 2)
 	while (--i)
 	{
-		read_maps(bot, piece, line);
+		read_map_bot(bot, line);
+//		write_strs(bot->map);
+		init_piece(piece, line);
+//		read_maps(bot, piece, line);
 		res = zero_coordinates();
-		output_res("./log_bot.txt", *bot, *piece, res);
+//		output_res("./log_bot.txt", *bot, *piece, res);
 //		output_res("./log_bot.txt", bot->map);
 //		output_res("./log_bot.txt", piece->map);
 		//sleep(30);
 		res = fight(bot, *piece);
-
-//		output_res("./log_bot.txt", piece->map);
-		ft_printf("%d %d\n", res.x, res.y);
 		del_matrix_str(piece->map);
+//		output_res("./log_bot.txt", piece->map);
+		ft_write(res);
+//		printf("%d %d\n", res.x, res.y);
 	}
 }
 
@@ -202,21 +232,24 @@ void	run_bot(t_bot *bot, t_piece *piece, char *line)
 //}
 
 
-int		main(int argc, char **argv)
+
+
+int		main(void)
 {
 	char *line;
 	t_bot bot;
 	t_piece piece;
 
 	line = NULL;
-	g_fd = open(argv[1], O_RDONLY, S_IREAD);
-	if (g_fd == -1)
-	{
-		write(1, "error open test file\n", 21);
-		return (0);
-	}
-	bot.player = find_player(line);
-	output_player("./log_player.txt", bot.player);
+//	g_fd = open("./test2.txt", O_RDONLY, S_IREAD);
+//	if (g_fd == -1)
+//	{
+//		write(1, "error open test file\n", 21);
+//		return (0);
+//	}
+	g_fd = 0;
+	find_players(&bot, line);
+//	output_player("./log_player.txt", bot);
 	create_map(&bot, line);
 	run_bot(&bot, &piece, line);
 	del_wave_matrix(bot.wt_path);

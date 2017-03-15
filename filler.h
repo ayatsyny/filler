@@ -16,8 +16,10 @@
 #define A(x) (x < 0 ? -x : x)
 #define M(a, b) (a < b ? a : b)
 #include <stdio.h>
-#include "./libft/ft_printf/ft_printf.h"
-#include "./libft/get_next_line/get_next_line.h"
+#include "./libft/libft.h"
+#include "./libft/get_next_line.h"
+//#include "./libft/ft_printf/ft_printf.h"
+//#include "./libft/get_next_line/get_next_line.h"
 //#include "./libft/ftall.h"
 
 typedef struct		s_coordinates
@@ -29,7 +31,9 @@ typedef struct		s_coordinates
 typedef struct		s_bot
 {
 	t_coordinates yx;
+	t_coordinates p_yx;
 	char 	player;
+	char	pc_player;
 	char 	**map;
 	int 	**wt_path;
 }	t_bot;

@@ -5,60 +5,93 @@
 #                                                     +:+ +:+         +:+      #
 #    By: ayatsyny <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2017/01/15 20:51:56 by ayatsyny          #+#    #+#              #
-#    Updated: 2017/03/06 21:04:34 by ayatsyny         ###   ########.fr        #
+#    Created: 2016/12/06 06:01:55 by ayatsyny          #+#    #+#              #
+#    Updated: 2017/03/15 20:18:39 by ayatsyny         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = libftall.a
-
-LIBFT = libft.a
-LBP = ./libft/
-PRINTF = ./ft_printf/
-GNL = ./get_next_line/
-G = gcc
-
-
 CFLAGS = -Wall -Wextra -Werror
+SRC = ft_memset.c \
+		ft_bzero.c \
+		ft_memcpy.c \
+		ft_memccpy.c \
+		ft_memmove.c \
+		ft_memchr.c \
+		ft_memcmp.c \
+		ft_strlen.c \
+		ft_strdup.c \
+		ft_strcpy.c \
+		ft_strncpy.c \
+		ft_strcat.c \
+		ft_strncat.c \
+		ft_strlcat.c \
+		ft_strchr.c \
+		ft_strrchr.c \
+		ft_strstr.c \
+		ft_strnstr.c \
+		ft_strcmp.c \
+		ft_strncmp.c \
+		ft_atoi.c \
+		ft_isalpha.c \
+		ft_isdigit.c \
+		ft_isalnum.c \
+		ft_isascii.c \
+		ft_isprint.c \
+		ft_toupper.c \
+		ft_tolower.c \
+		ft_memalloc.c \
+		ft_memdel.c \
+		ft_strnew.c \
+		ft_strdel.c \
+		ft_strclr.c \
+		ft_striter.c \
+		ft_striteri.c \
+		ft_strmap.c \
+		ft_strmapi.c \
+		ft_strequ.c \
+		ft_strnequ.c \
+		ft_strsub.c \
+		ft_strjoin.c \
+		ft_strtrim.c \
+		ft_strsplit.c \
+		ft_itoa.c \
+		ft_putchar.c \
+		ft_putstr.c \
+		ft_putendl.c \
+		ft_putnbr.c \
+		ft_putchar_fd.c \
+		ft_putstr_fd.c \
+		ft_putendl_fd.c \
+		ft_putnbr_fd.c \
+		ft_lstnew.c \
+		ft_lstdelone.c \
+		ft_lstdel.c \
+		ft_lstadd.c \
+		ft_lstiter.c \
+		ft_lstmap.c \
+		ft_count_words.c \
+		ft_len_num.c \
+		ft_iswhitespace.c \
+		ft_strupcase.c \
+		ft_strlowcase.c \
+		get_next_line.c
 
-SRC = $(./libft/*.c) $(./get_next_line/*.c) $(./ft_printf/*.c)
-
-OBJ = $(./libft/*.o) $(./get_next_line/*.o) $(./ft_printf/*.o)
-
-
-OBJS = $(SRC:.c=.o)
-
-HDR = ftall.h
-
-DEL = rm -f
+OBJ = $(SRC:.c=.o)
+NAME = libft.a
 
 all: $(NAME)
 
-$(NAME) : $(OBJS)
-		make -C libft
-		make -C ft_printf
-	#	ar -cru $(LBP) $(OBJS), $(PRINTF)$(OBJS), ./get_next_line/$(OBJS)
-#		LIST_FILE = find -name '*.c' -o -name '*.o'
-		ar -cru $(NAME) $(OBJS)
-		ranlib $(NAME)
-		@echo libftall.a is CREATED!!!
+$(NAME): $(OBJ)
+	ar -cru $(NAME) $(OBJ)
+	ranlib libft.a
 
-$(OBJS): $(HDR)
-
-%.o: %.c
-		$(G) $(CFLAGS) -c -o $@ $<
+%.o: %.c libft.h get_next_line.h
+	gcc $(CFLAGS) -I.  -c -o $@ $<
 
 clean:
-		find . -name \*.o -type f -delete
-		@echo objects_files is DELETE!!!
+	rm -f $(OBJ)
 
 fclean: clean
-		find . -name \*.a -type f -delete
-		@echo libftall.a is DELETE!!!
+	rm -f $(NAME)
 
 re: fclean all
-		@echo ALL DAMM FPS is DESTROYED!!!
-
-norm:
-		make norm -C ./get_next_line
-		make norm -C ./ft_printf

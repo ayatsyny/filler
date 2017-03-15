@@ -11,6 +11,12 @@ run comanned
 
 run program
 
--p1 cmake-build-debug/filler -p2 doc/resources/grati.filler -v -f ./doc/resources/maps/map00
+
+new run program
+-p1 ./filler -p2 ./grati.filler -v -f ./maps/map00
+
+#  -p1 cmake-build-debug/filler -p2 doc/resources/grati.filler -v -f ./doc/resources/maps/map00
 
 test program with test_file:
+
+
