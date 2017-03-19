@@ -6,7 +6,7 @@ set(CCMAKE_C_FLAGS "-std=c99")
 set(SOURCE_FILES
         pars_data.c
         put_piece.c
-        wave_matrix.c
+        del_matrix.c
         filler.h)
 
 add_executable(filler ${SOURCE_FILES})

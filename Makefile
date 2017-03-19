@@ -17,7 +17,7 @@ FLAGS = -Wall -Wextra -Werror
 
 SRCS = pars_data.c \
 	   put_piece.c \
-	   wave_matrix.c
+	   del_matrix.c
 
 HDR = filler.h
 

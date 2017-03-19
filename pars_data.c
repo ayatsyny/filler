@@ -1,13 +1,8 @@
-//
-// Created by Andriy Yatsynyak on 3/7/17.
-//
-
 #include "filler.h"
-#include <stdio.h>
 #include <fcntl.h>
-#include <string.h>
 #include <errno.h>
 
+// test val
 int g_fd;
 
 //
@@ -17,6 +12,18 @@ int g_fd;
 //	while (strs[++i])
 //		printf("%s\n", strs[i]);
 //}
+
+
+void    init_bot(t_bot *bot)
+{
+    bot->player = 0;
+    bot->pc_player = 0;
+    bot->pc_elemts = 0;
+    bot->pc_game_over = 0;
+    bot->yx = zero_coordinates();
+    bot->map = NULL;
+    bot->wt_path = NULL;
+}
 
 void	init_y_and_x(char *line, int *y, int *x)
 {
@@ -50,7 +57,6 @@ void	init_bot_wt_matrix(t_bot *bot)
 	int j;
 
 	i = -1;
-	bot->p_yx = zero_coordinates();
 	while (++i < bot->yx.x)
 	{
 		j = -1;
@@ -62,6 +68,23 @@ void	init_bot_wt_matrix(t_bot *bot)
 	}
 }
 
+unsigned    count_pc_elemets(t_bot *bot)
+{
+    int i;
+    int j;
+    unsigned count;
+
+    i = -1;
+    count = 0;
+    while (++i < bot->yx.x)
+    {
+        j = -1;
+        while (++j < bot->yx.y)
+            if (bot->pc_player == bot->map[i][j])
+                count++;
+    }
+    return (count);
+}
 
 
 void	init_piece(t_piece *piece, char *line)
@@ -81,20 +104,6 @@ void	init_piece(t_piece *piece, char *line)
 		ft_strcpy(piece->map[i], line);
 	}
 	piece->map[i] = NULL;
-}
-
-void	del_matrix_str(char **matrix)
-{
-	int i;
-
-	i = -1;
-	 while (matrix[++i] != NULL)
-	 {
-		 free(matrix[i]);
-		 matrix[i] = NULL;
-	 }
-	free(matrix);
-	matrix = NULL;
 }
 
 void	find_players(t_bot *bot, char *line)
@@ -226,7 +235,7 @@ void	run_bot(t_bot *bot, t_piece *piece, char *line)
 //	bot.player = find_player(line);
 //	create_map(&bot, line);
 //	run_bot(&bot, &map, line);
-//	del_wave_matrix(bot.wt_path);
+//	del_matrix_int(bot.wt_path);
 //	del_matrix_str(bot.map);
 //	return (0);
 //}
@@ -252,7 +261,7 @@ int		main(void)
 //	output_player("./log_player.txt", bot);
 	create_map(&bot, line);
 	run_bot(&bot, &piece, line);
-	del_wave_matrix(bot.wt_path);
+    del_matrix_int(bot.wt_path);
 	del_matrix_str(bot.map);
 	return (0);
 }

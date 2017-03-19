@@ -1,46 +1,15 @@
 #include "filler.h"
-#include <stdio.h>
 
-//int		check_put_piece(t_bot bot, t_piece piece, t_coordinates yx)
+//void	write_weither_matrix(t_bot bot)
 //{
-//	t_coordinates b;
-//	t_coordinates p;
-//	int count;
-//	char pc_player;
-//
-//	if (bot.yx.x < yx.x + piece.yx.x || bot.yx.y < yx.y + piece.yx.y)
-//		return (0);
-//	pc_player = ft_strchr("oO", bot.player) ? 'x' : 'o';
-//	b.x = yx.x - 1;
-//	p.x = -1;
-//	count = 0;
-//	while (++b.x < bot.yx.x && ++p.x < piece.yx.x)
+//	for(int i = 0; i < bot.yx.x; i++)
 //	{
-//		b.y = yx.y - 1;
-//		p.y = -1;
-//		while (++b.y < bot.yx.y && ++p.y < piece.yx.y)
-//		{
-//			if (piece.map[p.x][p.y] == '.')
-//				continue ;
-//			else if (count > 1 || bot.map[b.x][b.y] == pc_player)
-//				return (0);
-//			count += bot.player == bot.map[b.x][b.y] || bot.player - 32
-//						 == bot.map[b.x][b.y] ? 1 : 0;
-//		}
+//		for(int j = 0; j < bot.yx.y; j++)
+//			printf("\t%4d ", bot.wt_path[i][j]);
+//		printf("\n");
 //	}
-//	return (count);
+//	printf("\n\n\n");
 //}
-
-void	write_weither_matrix(t_bot bot)
-{
-	for(int i = 0; i < bot.yx.x; i++)
-	{
-		for(int j = 0; j < bot.yx.y; j++)
-			printf("\t%4d ", bot.wt_path[i][j]);
-		printf("\n");
-	}
-	printf("\n\n\n");
-}
 
 int		check_put_piece(t_bot bot, t_piece piece, t_coordinates b)
 {
@@ -53,20 +22,16 @@ int		check_put_piece(t_bot bot, t_piece piece, t_coordinates b)
 	count = 0;
 	while (++p.x < piece.yx.x)
 	{
-//		b.x += p.x;
 		p.y = -1;
 		while (++p.y < piece.yx.y)
 		{
-//			b.y += p.y;
 			if (piece.map[p.x][p.y] == '.')
 				continue ;
 			else if (b.x + p.x > bot.yx.x || b.y + p.y > bot.yx.y || count > 1
 					 || bot.pc_player == bot.map[b.x + p.x][b.y + p.y])
 				return (0);
-			else if (piece.map[p.x][p.y] == '*' && (bot.player == bot.map[b.x + p.x][b.y + p .y]))
+			else if (bot.player == bot.map[b.x + p.x][b.y + p .y])
 				count++;
-//			count += bot.player == bot.map[b.x][b.y] || bot.player - 32
-//						 == bot.map[b.x][b.y] ? 1 : 0;
 		}
 	}
 	return (count == 1 ? 1 : 0);
@@ -283,8 +248,8 @@ void 	wave_matrix(t_bot *bot)
 
 unsigned	sum_weight(t_bot bot, t_piece piece, t_coordinates yx)
 {
-	int i; // row  y
-	int j; // colum x
+	int i;
+	int j;
 	unsigned weight;
 
 	weight = 0;
@@ -293,8 +258,8 @@ unsigned	sum_weight(t_bot bot, t_piece piece, t_coordinates yx)
 	{
 		j = yx.y - 1;
 		while (++j < yx.y + piece.yx.y)
-			weight += bot.wt_path[i][j] != MAX_INT_MAP && bot.wt_path[i][j] != -2 ?
-						  bot.wt_path[i][j] : 0;
+			weight += bot.wt_path[i][j] != MAX_INT_MAP &&
+                              bot.wt_path[i][j] != -2 ? bot.wt_path[i][j] : 0;
 	}
 	return (weight);
 }
@@ -306,6 +271,22 @@ t_coordinates	zero_coordinates(void)
 	yx.x = 0;
 	yx.y = 0;
 	return (yx);
+}
+
+int    check_game_over(t_bot *bot)
+{
+    unsigned res;
+
+    res = count_pc_elemets(bot);
+    if (bot->pc_elemts < res)
+        bot->pc_elemts = res;
+    else
+    {
+        bot->pc_game_over = 1;
+        return (0);
+    }
+    bot->pc_game_over = 0;
+    return (1);
 }
 
 
@@ -321,11 +302,12 @@ t_coordinates	fight(t_bot *bot, t_piece piece)
 	res = zero_coordinates();
 	weight = MAX_INT_MAP;
 	init_bot_wt_matrix(bot);
+
+    check_game_over(bot) == 1 ? wave_matrix(bot) : 0;
 //	printf("init matrix \n");
 //	write_weither_matrix(*bot);
 //	sleep(3);
 //	printf("wave matrix \n");
-	wave_matrix(bot);
 //	test = find_pc_bot(*bot);
 //	wave_matrix(test.x, test.y, bot, 1);
 //	write_weither_matrix(*bot);
@@ -343,6 +325,8 @@ t_coordinates	fight(t_bot *bot, t_piece piece)
 				res = yx;
 				f = 0;
 			}
+            if (bot->pc_game_over)
+                return (yx);
 //			init_bot_wt_matrix(bot);
 //			printf("init matrix \n");
 //			write_weither_matrix(*bot);
@@ -353,10 +337,7 @@ t_coordinates	fight(t_bot *bot, t_piece piece)
 //			sleep(10);
 			temp = sum_weight(*bot, piece, yx);
 			if ((weight > temp ? weight = temp : 0))
-			{
-				res.x = yx.x;
-				res.y = yx.y;
-			}
+                res = yx;
 		}
 	}
 	return (res);
